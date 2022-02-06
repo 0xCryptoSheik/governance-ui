@@ -139,6 +139,7 @@ const SplTokenTransfer = ({
       index
     )
   }, [form])
+
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.mint?.account)

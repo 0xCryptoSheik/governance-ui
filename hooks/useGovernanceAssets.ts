@@ -13,6 +13,7 @@ import {
   AccountInfoGen,
   getMultipleAccountInfoChunked,
   GovernedMintInfoAccount,
+  GovernedMultiTypeAccount,
   GovernedTokenAccount,
   parseMintAccountData,
 } from '@utils/tokens'
@@ -106,6 +107,7 @@ export default function useGovernanceAssets() {
   const getAvailableInstructions = () => {
     return availableInstructions.filter((x) => x.isVisible)
   }
+
   async function getMintWithGovernances() {
     const mintGovernances = getGovernancesByAccountTypes([
       GovernanceAccountType.MintGovernanceV1,
@@ -133,6 +135,7 @@ export default function useGovernanceAssets() {
     })
     return governedMintInfoAccounts
   }
+
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
     (x) => !x.isNft
   )
@@ -142,7 +145,69 @@ export default function useGovernanceAssets() {
       g.governance &&
       ownVoterWeight.canCreateProposal(g.governance?.account?.config)
   )
+
+  const getGovernedMultiTypeAccounts = async (): Promise<
+    GovernedMultiTypeAccount[]
+  > => {
+    const mintWithGovernances = await getMintWithGovernances()
+
+    return governancesArray.map((gov) => {
+      const governedTokenAccount = governedTokenAccounts.find(
+        (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
+      )
+      if (governedTokenAccount) {
+        return governedTokenAccount as GovernedMultiTypeAccount
+      }
+
+      const mintGovernance = mintWithGovernances.find(
+        (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
+      )
+      if (mintGovernance) {
+        return mintGovernance as GovernedMultiTypeAccount
+      }
+
+      return {
+        governance: gov,
+      }
+    })
+  }
+
   const availableInstructions = [
+    {
+      id: Instructions.CreateAssociatedTokenAccount,
+      name: 'Create Associated Token Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.CreateSolendObligationAccount,
+      name: 'Solend: Create Obligation Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.InitSolendObligationAccount,
+      name: 'Solend: Init Obligation Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.DepositReserveLiquidityAndObligationCollateral,
+      name: 'Solend: Deposit Funds',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.RefreshSolendReserve,
+      name: 'Solend: Refresh Reserve',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.RefreshSolendObligation,
+      name: 'Solend: Refresh Obligation',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity,
+      name: 'Solend: Withdraw Funds',
+      isVisible: canUseAnyInstruction,
+    },
     {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
@@ -165,6 +230,11 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.ProgramUpgrade,
       name: 'Upgrade Program',
+      isVisible: canUseProgramUpgradeInstruction,
+    },
+    {
+      id: Instructions.SetProgramAuthority,
+      name: 'Set Program Authority',
       isVisible: canUseProgramUpgradeInstruction,
     },
     {
@@ -256,6 +326,7 @@ export default function useGovernanceAssets() {
   ])
   return {
     governancesArray,
+    getGovernedMultiTypeAccounts,
     getGovernancesByAccountType,
     getGovernancesByAccountTypes,
     availableInstructions,

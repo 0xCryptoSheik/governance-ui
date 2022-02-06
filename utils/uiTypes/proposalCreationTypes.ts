@@ -3,6 +3,8 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { SupportedMintName } from '@tools/sdk/solend/configuration'
+import { SplTokenUIName } from '@utils/splTokens'
 import {
   GovernedMintInfoAccount,
   GovernedMultiTypeAccount,
@@ -71,6 +73,12 @@ export interface ProgramUpgradeForm {
   bufferAddress: string
 }
 
+export interface ProgramAuthorityForm {
+  governedAccount: GovernedProgramAccount | GovernedTokenAccount | undefined
+  accountId: string | undefined
+  destinationAuthority: string
+}
+
 export interface MangoMakeChangeMaxAccountsForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
@@ -88,13 +96,56 @@ export interface EmptyInstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
 }
 
+export interface CreateAssociatedTokenAccountForm {
+  governedAccount?: GovernedMultiTypeAccount
+  splTokenMintUIName?: SplTokenUIName
+}
+
+export interface CreateSolendObligationAccountForm {
+  governedAccount?: GovernedMultiTypeAccount
+}
+
+export interface InitSolendObligationAccountForm {
+  governedAccount?: GovernedMultiTypeAccount
+}
+
+export interface DepositReserveLiquidityAndObligationCollateralForm {
+  governedAccount?: GovernedMultiTypeAccount
+  uiAmount: string
+  mintName?: SupportedMintName
+}
+
+export interface WithdrawObligationCollateralAndRedeemReserveLiquidityForm {
+  governedAccount?: GovernedMultiTypeAccount
+  uiAmount: string
+  mintName?: SupportedMintName
+}
+
+export interface RefreshObligationForm {
+  governedAccount?: GovernedMultiTypeAccount
+  mintName?: SupportedMintName
+}
+
+export interface RefreshReserveForm {
+  governedAccount?: GovernedMultiTypeAccount
+  mintName?: SupportedMintName
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
+  SetProgramAuthority,
   Mint,
   Base64,
   None,
   MangoMakeChangeMaxAccounts,
+  CreateAssociatedTokenAccount,
+  CreateSolendObligationAccount,
+  InitSolendObligationAccount,
+  DepositReserveLiquidityAndObligationCollateral,
+  WithdrawObligationCollateralAndRedeemReserveLiquidity,
+  RefreshSolendObligation,
+  RefreshSolendReserve,
   Grant,
   Clawback,
 }
