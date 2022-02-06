@@ -13,6 +13,9 @@ import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
+import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
+import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
+
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
 /**
  * Default governance program id instance
@@ -144,6 +147,8 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
+  ...SOLEND_PROGRAM_INSTRUCTIONS,
+  ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
 }
 
@@ -160,12 +165,18 @@ export async function getInstructionDescriptor(
     descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
   }
 
-  const descriptor = descriptors && descriptors[instruction.data[0]]
+  // Make it work for program with one instruction like ATA program
+  // and for the one with multiple instructions
+  const descriptor = !instruction.data.length
+    ? descriptors
+    : descriptors && descriptors[instruction.data[0]]
+
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection,
       instruction.data,
-      instruction.accounts
+      instruction.accounts,
+      instruction.programId
     ))) ?? <>{JSON.stringify(instruction.data)}</>
   return {
     name: descriptor?.name,

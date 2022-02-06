@@ -98,6 +98,15 @@
     "twitter": "@marinadefinance"
   },
   {
+    "symbol": "UXP",
+    "displayName": "UXD Protocol DAO - devnet",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3eZ6p8VxnmncMgVYK1oMGb7rSiZPxoi6vtpDr3qKMEG3",
+    "ogImage": "/realms/UXD/img/logo.png",
+    "website": "https://uxd.fi",
+    "twitter": "@UXDProtocol"
+  },
+  {
     "symbol": "REALM99",
     "displayName": "REALM99",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
